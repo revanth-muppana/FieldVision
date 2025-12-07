@@ -7,6 +7,7 @@ app = Flask(__name__)
 @app.route("/")
 def main():
     return '''
+     <p>Enter your text below:</p>
      <form action="/echo_user_input" method="POST">
          <input name="user_input">
          <input type="submit" value="Submit!">
@@ -16,4 +17,7 @@ def main():
 @app.route("/echo_user_input", methods=["POST"])
 def echo_input():
     input_text = request.form.get("user_input", "")
-    return "You entered: " + input_text
+    return '''
+    You entered: {}
+    <p><a href="/">Go back to home</a></p>
+    '''.format(input_text)
