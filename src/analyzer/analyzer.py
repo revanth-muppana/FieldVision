@@ -73,7 +73,6 @@ def run_analysis():
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM game_risk")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='game_risk'")
 
     # Fetch the latest raw record for every unique stadium
     cursor.execute('''
