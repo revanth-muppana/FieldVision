@@ -54,11 +54,10 @@ python src/collector/collector.py
 # Step 2: Analyze Data (Calculates Risk Scores)
 python src/analyzer/analyzer.py
 
-# Step 3: Launch Website
+# Step 3: Launch Website (Visit http://127.0.0.1:5000 to see the dashboard)
 python src/app.py
-
-Visit http://127.0.0.1:5000 to see the dashboard.
 ```
+
 
 ### 3. Testing
 ```bash
