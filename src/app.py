@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 from flask import Flask, render_template, jsonify, request, redirect, url_for
-import database  # Imports our shared database.py
+import database
 ph = database.get_placeholder()
 
 app = Flask(__name__)
 
-# --- ROUTES ---
+# Routes
 
 @app.route("/")
 def dashboard():
@@ -27,20 +26,20 @@ def dashboard():
     conn.close()
     return render_template("dashboard.html", games=games)
 
-# 1. NEW: Handle the Search Form Submission
+# Handle the Search Form Submission
 @app.route('/search', methods=['POST'])
 def search_team():
     query = request.form.get('team_query')
     # Redirect the user to the specific team URL
     return redirect(url_for('show_team', team_name=query))
 
-# 2. NEW: The "Other Page" (Team Details)
+# Team Details Page
 @app.route('/team/<team_name>')
 def show_team(team_name):
     conn = database.get_db_connection()
     cursor = conn.cursor()
     
-    # Use SQL LIKE to find matches (e.g. "Packers" finds "Green Bay Packers")
+    # Use SQL LIKE to find matches
     # The % symbols allow partial matching
     query = f'''SELECT * FROM game_risk WHERE team LIKE {ph}'''
     cursor.execute(query, ('%' + team_name + '%',))

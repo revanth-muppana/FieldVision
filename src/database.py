@@ -7,14 +7,14 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
     if DATABASE_URL:
-        # --- HEROKU (Postgres) ---
+        # Heroku (Postgres)
         import psycopg2
         import psycopg2.extras
         
         conn = psycopg2.connect(DATABASE_URL, sslmode='require', cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
     else:
-        # --- LOCAL (SQLite) ---
+        # Local (SQLite)
         import sqlite3
         
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,8 +30,6 @@ def init_db():
     c = conn.cursor()
     
     # Postgres uses SERIAL for auto-increment, SQLite uses INTEGER PRIMARY KEY
-    # We use a trick: standard SQL usually works for simple creates, 
-    # but let's be safe with basic TEXT/INT types.
     
     c.execute('''
         CREATE TABLE IF NOT EXISTS raw_weather (

@@ -3,7 +3,6 @@ import time
 import sys
 import os
 
-# Boilerplate to import database.py from parent directory
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import database
 ph = database.get_placeholder()
@@ -17,16 +16,15 @@ def analyze_weather(weather_json):
     temp = 70
     description = "Unknown"
 
-    # --- PARSING LOGIC (ROBUST) ---
-    # We try the Standard Nested format FIRST. 
-    # This works for Real API data AND the new Nested Mock data.
+    # Try the Standard Nested format first
+    # This works for Real API data and nested mock data
     try:
         forecast = data['list'][0] # Get the immediate forecast
         wind_speed = forecast['wind']['speed']
         temp = forecast['main']['temp']
         description = forecast['weather'][0]['description']
     except (KeyError, IndexError, TypeError):
-        # Fallback: If that fails, checks if it's the old "Flat" mock data
+        # If that fails, checks if it's the mock data
         if data.get("mock"):
             wind_speed = data.get("wind", 0)
             temp = data.get("temp", 70)
@@ -34,7 +32,7 @@ def analyze_weather(weather_json):
         else:
             return 0, "Unknown", "Parse Error"
 
-    # --- BUSINESS LOGIC ---
+    # Business Logic
     risk_score = 0
     reasons = []
 
@@ -77,8 +75,7 @@ def run_analysis():
     cursor.execute("DELETE FROM game_risk")
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='game_risk'")
 
-    # 1. Fetch the LATEST raw record for every unique stadium
-    # (This complex SQL ensures we don't re-analyze old data repeatedly)
+    # Fetch the latest raw record for every unique stadium
     cursor.execute('''
         SELECT stadium, team, forecast_json 
         FROM raw_weather 

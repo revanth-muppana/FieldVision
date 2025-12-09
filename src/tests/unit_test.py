@@ -3,14 +3,13 @@ import sys
 import os
 import json
 
-# --- PATH SETUP ---
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from analyzer import analyzer
 
 class TestAnalyzerLogic(unittest.TestCase):
 
-    # --- 1. BASIC LOGIC TESTS ---
+    # Basic Unit Tests
 
     def test_perfect_weather(self):
         """Test: Ideal conditions (72F, 5mph wind) = 0 Risk."""
@@ -52,7 +51,7 @@ class TestAnalyzerLogic(unittest.TestCase):
         # 10 is < 20, so it should still be LOW
         self.assertEqual(label, "LOW") 
 
-    # --- 2. MIXED CONDITION TESTS ---
+    # Mixed Condition Tests
 
     def test_blizzard_conditions(self):
         """Test: High Wind (80) + Deep Freeze (30) = 110 -> Cap at 100."""
@@ -87,7 +86,7 @@ class TestAnalyzerLogic(unittest.TestCase):
         self.assertEqual(score, 50)
         self.assertEqual(label, "HIGH")
 
-    # --- 3. BOUNDARY / EDGE CASE TESTS ---
+    # Edge Case Tests
 
     def test_exact_boundaries(self):
         """Test: Exactly 15mph wind (Should be safe) vs 15.1mph (Risk)."""
@@ -115,7 +114,7 @@ class TestAnalyzerLogic(unittest.TestCase):
         self.assertEqual(score, 30)
         self.assertEqual(label, "MEDIUM")
 
-    # --- 4. DATA INTEGRITY TESTS ---
+    # Data Integrity Tests
 
     def test_missing_fields(self):
         """Test: Partial JSON where 'wind' exists but 'speed' is missing."""
@@ -138,8 +137,6 @@ class TestAnalyzerLogic(unittest.TestCase):
         """Test: Input is not even valid JSON."""
         # analyzer.analyze_weather expects a valid JSON string
         # json.loads() will raise JSONDecodeError.
-        # Ideally, our function might not handle this, so let's see if it crashes.
-        # A robust function would catch this, but currently ours lets it crash.
         # We will wrap it in assertRaises to prove it fails as expected.
         with self.assertRaises(ValueError):
             analyzer.analyze_weather("{ bad json ")

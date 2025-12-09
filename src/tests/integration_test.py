@@ -20,16 +20,16 @@ class GridironIntegrationTest(unittest.TestCase):
         Runs BEFORE every test.
         Switches the database to a temporary test file.
         """
-        # 1. Point the database to a test file
+        # Point the database to a test file
         self.test_db_path = os.path.join(os.path.dirname(__file__), 'test_fieldvision.db')
         database.DB_PATH = self.test_db_path
         
-        # 2. Initialize the fresh test DB
+        # Initialize the fresh test DB
         if os.path.exists(self.test_db_path):
             os.remove(self.test_db_path)
         database.init_db()
 
-        # 3. Setup the Flask Test Client
+        # Setup the Flask Test Client
         self.app = app.app.test_client()
         self.app.testing = True
 
@@ -47,9 +47,7 @@ class GridironIntegrationTest(unittest.TestCase):
         """
         print("\n--- Running Integration Test: Full Pipeline ---")
 
-        # 1. MOCK THE COLLECTOR
         # Instead of hitting the real API, we force the collector to use mock data.
-        # We assume the collector has a way to handle this, or we just inject data.
         print("1. Running Collector...")
         
         # Override the API Key to force the 'Mock Data' path in your collector.py
@@ -62,32 +60,32 @@ class GridironIntegrationTest(unittest.TestCase):
         # Restore key
         collector.API_KEY = original_key
 
-        # VERIFY: Did raw data get into the DB?
+        # Verify if raw data is in the DB
         conn = database.get_db_connection()
         raw_count = conn.execute("SELECT count(*) FROM raw_weather").fetchone()[0]
         self.assertGreater(raw_count, 0, "Collector failed to save raw data to DB")
         print(f"   (Pass) Collector saved {raw_count} records.")
 
-        # 2. RUN THE ANALYZER
+        # Analyze the mock data
         print("2. Running Analyzer...")
         analyzer.run_analysis()
 
-        # VERIFY: Did refined risk scores appear?
+        # Verify if refined risk scores appear
         risk_count = conn.execute("SELECT count(*) FROM game_risk").fetchone()[0]
         self.assertGreater(risk_count, 0, "Analyzer failed to save risk scores")
         print(f"   (Pass) Analyzer generated {risk_count} risk records.")
         conn.close()
 
-        # 3. QUERY THE WEB API
+        # Query the Web API
         print("3. Testing Web API Endpoint...")
         response = self.app.get('/api/risk')
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         
-        # CHECK BUSINESS LOGIC
+        # Check Business Logic
         # Our mock data in collector.py had High Wind (22mph) and Cold Temp (25.5F).
-        # So we EXPECT the analyzer to have labeled it "HIGH" or "MEDIUM".
+        # So we expect the analyzer to have labeled it "HIGH" or "MEDIUM".
         first_game = data[0]
         print(f"   API Returned: {first_game['team']} -> Risk: {first_game['risk_label']}")
         

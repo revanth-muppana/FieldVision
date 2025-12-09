@@ -8,11 +8,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import database
 ph = database.get_placeholder()
 
-# 1. CONSTANTS
 API_KEY = "1ec8ef9b0f6e6d5b4e8f949713730600"
 WEATHER_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
-# 2. DATA SOURCE: Lat/Lon for every NFL Stadium
 STADIUMS = {
     "Lambeau Field": {"lat": 44.5013, "lon": -88.0622, "team": "Packers"},
     "AT&T Stadium": {"lat": 32.7473, "lon": -97.0945, "team": "Cowboys"},
@@ -50,8 +48,7 @@ def get_weather(lat, lon):
     """
     Fetches the 5-day forecast for a given location.
     """
-    # --- 1. TEST INTERCEPTION ---
-    # If the test script set the key to this magic string, skip the network entirely!
+    # If the test script set the key to the mock string, skip the network call
     if API_KEY == "TEST_KEY_FORCE_MOCK":
         print(f"   [Test Mode] Returning mock data for {lat}, {lon}")
         return {
@@ -63,7 +60,7 @@ def get_weather(lat, lon):
             }]
         }
 
-    # --- 2. REAL NETWORK REQUEST ---
+    # Network Request
     params = {
         'lat': lat,
         'lon': lon,
@@ -74,7 +71,7 @@ def get_weather(lat, lon):
     try:
         response = requests.get(WEATHER_URL, params=params)
         
-        # Handle invalid keys (like if you haven't pasted yours in yet)
+        # Handle invalid keys
         if response.status_code == 401:
             print(f"Warning: 401 Unauthorized. Using mock data.")
             return {
