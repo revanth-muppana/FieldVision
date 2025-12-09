@@ -41,7 +41,7 @@ def show_team(team_name):
     
     # Use SQL LIKE to find matches
     # The % symbols allow partial matching
-    query = f'''SELECT * FROM game_risk WHERE team LIKE {ph}'''
+    query = f'''SELECT * FROM game_risk WHERE LOWER(team) LIKE LOWER({ph})'''
     cursor.execute(query, ('%' + team_name + '%',))
     game = cursor.fetchone()
     conn.close()
