@@ -76,10 +76,13 @@ def run_analysis():
 
     # Fetch the latest raw record for every unique stadium
     cursor.execute('''
-        SELECT stadium, team, forecast_json 
-        FROM raw_weather 
-        GROUP BY stadium 
-        HAVING max(collected_at)
+        SELECT stadium, team, forecast_json
+        FROM raw_weather
+        WHERE id IN (
+            SELECT MAX(id)
+            FROM raw_weather
+            GROUP BY stadium
+        )
     ''')
     
     raw_records = cursor.fetchall()

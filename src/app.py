@@ -52,10 +52,15 @@ def show_team(team_name):
 def api_risk():
     conn = database.get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
+    # CORRECT (Postgres Safe)
+    query = '''
         SELECT * FROM game_risk 
-        WHERE id IN (SELECT MAX(id) FROM game_risk GROUP BY team)
-    ''')
+        WHERE id IN (
+            SELECT MAX(id) FROM game_risk GROUP BY team
+        )
+        ORDER BY risk_score DESC
+    '''
+    cursor.execute(query)
     results = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return jsonify(results)
