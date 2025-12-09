@@ -17,9 +17,8 @@ def get_db_connection():
         # --- LOCAL (SQLite) ---
         import sqlite3
         
-        # Calculate path to gridiron.db in root
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        DB_PATH = os.path.join(BASE_DIR, 'gridiron.db')
+        DB_PATH = os.path.join(BASE_DIR, 'weather_data.db')
         
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row

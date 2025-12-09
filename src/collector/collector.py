@@ -100,8 +100,6 @@ def collect_and_save():
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM raw_weather")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='raw_weather'")
-
 
     count = 0
     for stadium_name, data in STADIUMS.items():
