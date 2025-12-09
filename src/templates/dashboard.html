@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FieldVision | Risk Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Dynamic Risk Colors */
+        .risk-HIGH {
+            border-left: 10px solid #e74c3c;
+        }
+
+        /* Red */
+        .risk-MEDIUM {
+            border-left: 10px solid #f1c40f;
+        }
+
+        /* Yellow */
+        .risk-LOW {
+            border-left: 10px solid #2ecc71;
+        }
+
+        /* Green */
+
+        .score-badge {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 50%;
+            width: 50px;
+            text-align: center;
+            background: #eee;
+        }
+
+        .details {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>FieldVision 🏈</h1>
+        <p style="text-align:center;">Real-time Weather Risk Analysis</p>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <form action="/search" method="POST">
+                <input type="text" name="team_query" placeholder="Enter Team Name (e.g. Packers)" required
+                    style="padding: 10px; width: 60%; font-size: 16px;">
+                <input type="submit" value="Search Team"
+                    style="padding: 10px 20px; font-size: 16px; background-color: #333; color: white; border: none; cursor: pointer;">
+            </form>
+        </div>
+
+        {% for game in games %}
+        <div class="card risk-{{ game.risk_label }}">
+
+            <div>
+                <h3>{{ game.team }} <span style="font-weight:normal; font-size:0.8em">@ {{ game.stadium }}</span></h3>
+                <p class="details">{{ game.details }}</p>
+            </div>
+
+            <div class="score-badge">
+                {{ game.risk_score }}
+            </div>
+
+        </div>
+        {% else %}
+        <div class="card">
+            <p>No data found. Please run the Collector and Analyzer scripts.</p>
+        </div>
+        {% endfor %}
+
+    </div>
+</body>
+
+</html>

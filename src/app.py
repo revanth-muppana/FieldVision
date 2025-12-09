@@ -1,23 +1,65 @@
 #!/usr/bin/env python3
-
-from flask import Flask, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+import database  # Imports our shared database.py
+ph = database.get_placeholder()
 
 app = Flask(__name__)
 
-@app.route("/")
-def main():
-    return '''
-     <p>Enter your text below:</p>
-     <form action="/echo_user_input" method="POST">
-         <input name="user_input">
-         <input type="submit" value="Submit!">
-     </form>
-     '''
+# --- ROUTES ---
 
-@app.route("/echo_user_input", methods=["POST"])
-def echo_input():
-    input_text = request.form.get("user_input", "")
-    return '''
-    You entered: {}
-    <p><a href="/">Go back to home</a></p>
-    '''.format(input_text)
+@app.route("/")
+def dashboard():
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+
+    query = '''
+        SELECT * FROM game_risk 
+        WHERE id IN (
+            SELECT MAX(id) 
+            FROM game_risk 
+            GROUP BY team
+        )
+        ORDER BY risk_score DESC
+    '''
+
+    cursor.execute(query)
+    games = cursor.fetchall()
+    conn.close()
+    return render_template("dashboard.html", games=games)
+
+# 1. NEW: Handle the Search Form Submission
+@app.route('/search', methods=['POST'])
+def search_team():
+    query = request.form.get('team_query')
+    # Redirect the user to the specific team URL
+    return redirect(url_for('show_team', team_name=query))
+
+# 2. NEW: The "Other Page" (Team Details)
+@app.route('/team/<team_name>')
+def show_team(team_name):
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    
+    # Use SQL LIKE to find matches (e.g. "Packers" finds "Green Bay Packers")
+    # The % symbols allow partial matching
+    query = f'''SELECT * FROM game_risk WHERE team LIKE {ph}'''
+    cursor.execute(query, ('%' + team_name + '%',))
+    game = cursor.fetchone()
+    conn.close()
+
+    return render_template("team.html", game=game, search_term=team_name)
+
+@app.route('/api/risk')
+def api_risk():
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM game_risk 
+        WHERE id IN (SELECT MAX(id) FROM game_risk GROUP BY team)
+    ''')
+    results = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify(results)
+
+if __name__ == '__main__':
+    app.run(debug=True)

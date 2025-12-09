@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team Detail</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; padding: 40px; text-align: center; }
+        .container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .score { font-size: 4em; font-weight: bold; margin: 20px 0; }
+        .back-btn { text-decoration: none; color: white; background: #333; padding: 10px 20px; border-radius: 5px; }
+        
+        .risk-HIGH { color: #e74c3c; }
+        .risk-MEDIUM { color: #f1c40f; }
+        .risk-LOW { color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        {% if game %}
+            <h1>{{ game.team }}</h1>
+            <h3>Playing at: {{ game.stadium }}</h3>
+            
+            <hr>
+            
+            <div class="score risk-{{ game.risk_label }}">
+                {{ game.risk_score }}
+            </div>
+            
+            <h2>Risk Level: {{ game.risk_label }}</h2>
+            <p>{{ game.details }}</p>
+
+        {% else %}
+            <h1>Team Not Found</h1>
+            <p>Sorry, we couldn't find a team matching "<b>{{ search_term }}</b>".</p>
+        {% endif %}
+
+        <br><br>
+        <a href="/" class="back-btn">← Back to Dashboard</a>
+    </div>
+
+</body>
+</html>
